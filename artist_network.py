@@ -10,8 +10,8 @@ import spotipy.util as util
 
 N_neighbors = 6
 depth = 3
-N_songs_per_artist = 3
-score_threshold = 10
+ratio_score_songs = 4
+# N_songs_per_artist = 3
 
 def get_id(response):
 	if(len(response) > 0):
@@ -28,7 +28,7 @@ def search_similar_artists(en,artist_list,N_neighbors=3,depth=3,pop_threshold=0.
 		b,artist = get_id(t)
 		if(b):
 			queue.append(artist)
-			G.add_node(artist['id'],name=artist['name'], hotness = artist['hotttnesss'],depth=0,score=5,
+			G.add_node(artist['id'],name=artist['name'], hotness = artist['hotttnesss'],depth=0,score=8,
 						spotify_id=artist['foreign_ids'][0]['foreign_id'])
 	done = set()
 	# print(queue)
@@ -100,20 +100,21 @@ def connected_components(G):
 		display_graph(G2)
 	plt.show()
 
-def get_all_hot_songs(en,artists,liked_tracks):
+def get_all_hot_songs(en,artists,G,liked_tracks):
 	all_tracks = []
 	popularity = []
 	for artist in artists:
-		response = en.get('song/search', artist_id =artist, results=2*N_songs_per_artist,
+		N_songs = int(G.node[artist]['score'] / ratio_score_songs)
+		response = en.get('song/search', artist_id =artist, results=2*N_songs,
 						  bucket=['song_hotttnesss','id:spotify','tracks'], sort='song_hotttnesss-desc')['songs']
-		last_title = None
+		last_titles = []
 		k = 0
 		found = 0
-		while(k< len(response) and found < N_songs_per_artist):
+		while(k< len(response) and found < N_songs):
 			song = response[k]
-			if not(song['title'] == last_title or song['title'] in liked_tracks):
+			if not(song['title'] in last_titles or song['title'] in liked_tracks):
 				if(len(song['tracks']) > 0 and 'foreign_id' in song['tracks'][0] ):
-					last_title = song['title']
+					last_titles.append(song['title'])
 					all_tracks.append(song['tracks'][0]['foreign_id'])
 					popularity.append(song['song_hotttnesss'])
 					found += 1

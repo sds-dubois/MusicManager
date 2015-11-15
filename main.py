@@ -14,8 +14,9 @@ en = pyen.Pyen()
 search_liked_tracks = False
 create_artist_network = False
 show_best_subgraph = False
-check_new_tracks = False
+check_new_tracks = True
 add_to_playlist = True
+score_threshold = 10
 
 username = os.environ.get("SPOTIPY_USERNAME")
 
@@ -59,12 +60,12 @@ def get_liked_tracks(p_name='Liked'):
 		if(playlist is not None):
 			results = sp.user_playlist(username, playlist['id'], fields="tracks,next")
 			tracks = results['tracks']
-			liked_tracks += [ item['track']['name'] for item in tracks['items'] ]
-			liked_artists += [ item['track']['artists'][0]['name'] for item in tracks['items'] ]
+			liked_tracks.update([ item['track']['name'] for item in tracks['items'] ])
+			liked_artists.update([ item['track']['artists'][0]['name'] for item in tracks['items'] ])
 
 			while tracks['next']:
-				liked_tracks += [ item['track']['name'] for item in tracks['items'] ]
-				liked_artists += [ item['track']['artists'][0]['name'] for item in tracks['items'] ]
+				liked_tracks.update([ item['track']['name'] for item in tracks['items'] ])
+				liked_artists.update([ item['track']['artists'][0]['name'] for item in tracks['items'] ])
 				tracks = sp.next(tracks)
 
 			save_likes(liked_tracks,liked_artists)
@@ -86,7 +87,7 @@ if(create_artist_network):
 G = nx.read_yaml('artist_graph')
 print('Loaded artist network : ' + str(len(G.nodes())) + ' nodes')
 
-scores = [d['score'] for n,d in G.nodes(data=True)]
+# scores = [d['score'] for n,d in G.nodes(data=True)]
 best_nodes = [n for n in G.nodes() if G.node[n]['score'] > score_threshold]
 print(str(len(best_nodes)) + ' selected artists')
 
@@ -96,7 +97,7 @@ if(show_best_subgraph):
 	plt.show()
 
 if(check_new_tracks):
-	all_tracks = get_all_hot_songs(en,best_nodes,liked_tracks)
+	all_tracks = get_all_hot_songs(en,best_nodes,G,liked_tracks)
 	output_file = open('new_tracks.csv', 'wb')
 	pickle.dump(all_tracks,output_file)
 	output_file.close()
