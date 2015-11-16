@@ -100,29 +100,35 @@ def connected_components(G):
 		display_graph(G2)
 	plt.show()
 
-def get_all_hot_songs(en,artists,G,liked_tracks):
+def remember_song(song,history):
+	id = song['artist_foreign_ids'][0]['foreign_id']
+	if not(id in history):
+		history[id] = []
+	history[id].append(song['title'].lower())
+	return history
+
+def get_all_hot_songs(en,artists,G,history):
 	all_tracks = []
 	popularity = []
 	for artist in artists:
 		N_songs = int(G.node[artist]['score'] / ratio_score_songs)
 		response = en.get('song/search', artist_id =artist, results=2*N_songs,
 						  bucket=['song_hotttnesss','id:spotify','tracks'], sort='song_hotttnesss-desc')['songs']
-		last_titles = []
 		k = 0
 		found = 0
 		while(k< len(response) and found < N_songs):
 			song = response[k]
-			if not(song['title'] in last_titles or song['title'] in liked_tracks):
-				if(len(song['tracks']) > 0 and 'foreign_id' in song['tracks'][0] ):
-					last_titles.append(song['title'])
+			if(len(song['tracks']) > 0 and 'foreign_id' in song['tracks'][0] ):
+				if not(song['artist_foreign_ids'][0]['foreign_id'] in history and song['title'].lower() in history[song['artist_foreign_ids'][0]['foreign_id']]):
+					history = remember_song(song,history)
 					all_tracks.append(song['tracks'][0]['foreign_id'])
 					popularity.append(song['song_hotttnesss'])
 					found += 1
 					print(song['title'],song['artist_name'])
-				# else:
-				# 	print('Oops, no spotify id')
+			# else:
+			# 	print('Oops, no spotify id')
 			k += 1
-	return(np.asarray(all_tracks)[np.argsort(popularity)[::-1]])
+	return(np.asarray(all_tracks)[np.argsort(popularity)[::-1]],history)
 
 
 def add_new_tracks(new_tracks,username,token,to_playlist='ToDiscover'):
