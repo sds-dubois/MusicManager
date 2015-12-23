@@ -16,6 +16,7 @@ def populate_db(artists,en,reset=False):
 					details[key] = song[key]
 				details['artist_id'] = artist
 				details['track_id'] = song['tracks'][0]['foreign_id']
+				details['opinion'] = -1
 				df = df.append(details, ignore_index=True)
 				print(song['title'],song['artist_name'])
 	df = df.set_index('track_id')

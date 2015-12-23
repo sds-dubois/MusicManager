@@ -34,6 +34,9 @@ print('Loaded artist network : ' + str(len(G.nodes())) + ' nodes')
 best_nodes = [n for n in G.nodes() if G.node[n]['score'] > score_threshold]
 print(str(len(best_nodes)) + ' selected artists')
 
+if(create_db):
+	populate_db(liked_artists,en)
+
 if(show_best_subgraph):
 	G_bests = G.subgraph(best_nodes)
 	display_graph(G_bests)
