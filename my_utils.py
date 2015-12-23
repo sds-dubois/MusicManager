@@ -42,6 +42,13 @@ def get_playlist(p_name):
 
 	return p_name_id
 
+def remove_from_playlist(track_id, from_playlist='ToDiscover'):
+	from_playlist_id = get_playlist(from_playlist)
+	sp.user_playlist_remove_all_occurrences_of_tracks(username,
+													  from_playlist_id,
+													  [track_id])
+	print 'Removed track from ' + from_playlist
+
 def save_likes(liked_artists):
 	output_file = open('liked_artists.csv', 'wb')
 	pickle.dump(liked_artists,output_file)
@@ -60,7 +67,6 @@ def add_to_history(item,history):
 	if not(id in history):
 		history[id] = []
 	history[id].append(title.lower())
-
 
 def get_liked_tracks(p_name='Liked',history={}):
 	token = login()
