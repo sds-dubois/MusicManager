@@ -16,6 +16,39 @@ def login(scope='user-library-read'):
     token = util.prompt_for_user_token(username, scope)    
     return(token)
 
+def login_spotify_playlist():
+	token = login('playlist-modify-public')
+	sp = spotipy.Spotify(auth=token)
+
+	if not(token):
+		print 'ERROR: unable to log in Spotify'
+		sys.exit(1)
+
+	return sp
+
+def get_playlist(p_name):
+	sp = login_spotify_playlist()
+
+	# get 'toDiscover' playlist
+	playlists = sp.user_playlists(username)['items']
+	p_name_id = None
+	for p in playlists:
+		if(p['name'] == p_name):
+			p_name_id = p['id']
+
+	if p_name_id is None:
+		print 'ERROR: did not find playlist'
+		sys.exit(1)
+
+	return p_name_id
+
+def remove_from_playlist(track_id, from_playlist='ToDiscover'):
+	from_playlist_id = get_playlist(from_playlist)
+	sp.user_playlist_remove_all_occurrences_of_tracks(username,
+													  from_playlist_id,
+													  [track_id])
+	print 'Removed track from ' + from_playlist
+
 def save_likes(liked_artists):
 	output_file = open('liked_artists.csv', 'wb')
 	pickle.dump(liked_artists,output_file)
@@ -34,7 +67,6 @@ def add_to_history(item,history):
 	if not(id in history):
 		history[id] = []
 	history[id].append(title.lower())
-
 
 def get_liked_tracks(p_name='Liked',history={}):
 	token = login()
