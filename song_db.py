@@ -1,6 +1,11 @@
 import pandas as pd
 limit_per_artist = 20
 
+def update_opinion(track_id,o):
+	df = pd.read_csv('song_db.csv', encoding='utf-8', index_col='track_id')
+	df.set_value(track_id,'opinion',o)
+
+
 def populate_db(artists,en,reset=False):
 	df = pd.DataFrame()
 	for artist in artists:
@@ -21,7 +26,6 @@ def populate_db(artists,en,reset=False):
 				print(song['title'],song['artist_name'])
 	df = df.set_index('track_id')
 	if not(reset):
-		df2 = pd.read_csv('song_db.csv', encoding='utf-8')
-		df2 = df2.set_index('track_id')
+		df2 = pd.read_csv('song_db.csv', encoding='utf-8', index_col='track_id')
 		df = df2.append(df)
 	df.to_csv('song_db.csv', encoding='utf-8')

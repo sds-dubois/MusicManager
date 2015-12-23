@@ -1,5 +1,6 @@
 from my_utils import *
 from config import *
+from song_db import *
 
 import sys
 
@@ -10,12 +11,12 @@ def add(track_id):
 	sp.user_playlist_add_tracks(username,
 								liked_playlist_id,
 								[track_id])
-	# ToDo: update song_db
+	update_opinion(track_id,1)
 
 
 def remove(track_id):
 	remove_from_playlist(track_id)
-	# ToDo: update song_db
+	update_opinion(track_id,0)
 
 
 if __name__ == '__main__':
