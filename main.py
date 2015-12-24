@@ -45,11 +45,7 @@ if(check_new_tracks):
 	get_new_suggestions(best_nodes,G,history)
 
 if(add_to_playlist):
-	token = login('playlist-modify-public')
 	input_file = open('new_tracks.csv', 'r')
 	new_tracks = pickle.load(input_file)
 	input_file.close()
-	if(token):
-		add_new_tracks(new_tracks,username,token)
-	else:
-		print("Can't get token for", username)
+	add_new_tracks(new_tracks)

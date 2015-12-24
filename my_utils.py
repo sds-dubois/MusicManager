@@ -41,14 +41,21 @@ def get_playlist(p_name):
 		print 'ERROR: did not find playlist'
 		sys.exit(1)
 
-	return p_name_id
+	return sp, p_name_id
 
 def remove_from_playlist(track_id, from_playlist='ToDiscover'):
-	from_playlist_id = get_playlist(from_playlist)
+	sp, from_playlist_id = get_playlist(from_playlist)
 	sp.user_playlist_remove_all_occurrences_of_tracks(username,
 													  from_playlist_id,
 													  [track_id])
 	print 'Removed track from ' + from_playlist
+
+def add_new_tracks(new_tracks,to_playlist='ToDiscover'):
+	sp, to_playlist_id = get_playlist(to_playlist)
+	for i in xrange(len(new_tracks)/100 +1):
+		sp.user_playlist_add_tracks(username,
+									to_playlist_id,new_tracks[(i*100):((i+1)*100)])
+	print 'Added ' + str(len(new_tracks)) + ' new tracks'
 
 def save_liked_artists(liked_artists):
 	output_file = open('liked_artists.csv', 'wb')
