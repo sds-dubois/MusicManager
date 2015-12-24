@@ -5,6 +5,16 @@ from song_db import *
 import sys
 
 
+def save(track_id):
+	# add to Liked playlist
+	liked_playlist_id = get_playlist('Liked')
+	sp.user_playlist_add_tracks(username,
+								liked_playlist_id,
+								[track_id])	
+
+	# add to history and songdb
+	add_save_track(track_id)
+
 def add(track_id):
 	remove_from_playlist(track_id)
 	liked_playlist_id = get_playlist('Liked')
