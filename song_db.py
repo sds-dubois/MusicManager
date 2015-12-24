@@ -9,6 +9,7 @@ ratio_score_songs = 4
 def update_opinion(track_id,o):
 	df = pd.read_csv('song_db.csv', encoding='utf-8', index_col='track_id')
 	df.set_value(track_id,'opinion',o)
+	df.to_csv('song_db.csv', encoding='utf-8')
 
 def remember_song(song,history):
 	id = song['artist_foreign_ids'][0]['foreign_id']
