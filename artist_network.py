@@ -1,3 +1,5 @@
+from config import *
+
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -24,7 +26,7 @@ def search_similar_artists(en,artist_list,N_neighbors=3,net_depth=3,pop_threshol
 		b,artist = get_id(t)
 		if(b):
 			queue.append(artist)
-			G.add_node(artist['id'],name=artist['name'], hotness = artist['hotttnesss'],net_depth=0,score=8,
+			G.add_node(artist['id'],name=artist['name'], hotness = artist['hotttnesss'],depth=0,score=8,
 						spotify_id=artist['foreign_ids'][0]['foreign_id'])
 	done = set()
 	# print(queue)
@@ -43,7 +45,7 @@ def search_similar_artists(en,artist_list,N_neighbors=3,net_depth=3,pop_threshol
 					r += 1
 					if not (a['id'] in done or a['id'] in queue or a['id'] in queue2 or a['hotttnesss'] < pop_threshold):
 						if('foreign_ids' in a):
-							G.add_node(a['id'],name=a['name'], hotness = a['hotttnesss'],net_depth=(d+1),score=0,
+							G.add_node(a['id'],name=a['name'], hotness = a['hotttnesss'],depth=(d+1),score=0,
 									spotify_id=a['foreign_ids'][0]['foreign_id'])
 							# print a['id'], a['name']
 							queue2.append(a)
@@ -62,7 +64,7 @@ def generate_graph(en,liked_artists):
 	# adding nodes' score
 	for n in G.nodes():
 		d = G.degree(n)
-		G.node[n]['score'] += scoring(d,G.node[n]['hotness'],G.node[n]['net_depth'])
+		G.node[n]['score'] += scoring(d,G.node[n]['hotness'],G.node[n]['depth'])
 	nx.write_yaml(G,'artist_graph')
 
 def scoring(degree,popularity,net_depth):
@@ -75,14 +77,14 @@ def display_graph(G):
 	col = ['red','blue','green','orange']
 	sizes =dict((n,d['hotness']) for n,d in G.nodes(data=True))
 	names =dict((n,d['name']) for n,d in G.nodes(data=True))
-	colors =dict((n,col[d['net_depth']]) for n,d in G.nodes(data=True))
+	colors =dict((n,col[d['depth']]) for n,d in G.nodes(data=True))
 	widths = [0.3*(net_N_neighbors-d['rank'])+0.5 for n1,n2,d in G.edges(data=True)]
 
 	plt.figure(figsize=(30,25))
 	graph_pos = nx.spring_layout(G)
 	center = np.mean(graph_pos.values())
 	for n in graph_pos.keys():
-		graph_pos[n] = center + (graph_pos[n]-center)/(0.2*(net_depth-G.node[n]['net_depth'])+1.)
+		graph_pos[n] = center + (graph_pos[n]-center)/(0.2*(net_depth-G.node[n]['depth'])+1.)
 	nx.draw_networkx_nodes(G, graph_pos, nodelist=graph_pos.keys(), node_size=[30.*(1+sizes[n])**6 for n in graph_pos.keys()],
 							node_color=[colors[n] for n in graph_pos.keys()], alpha=0.5)
 	nx.draw_networkx_edges(G, pos=graph_pos, width=widths)
