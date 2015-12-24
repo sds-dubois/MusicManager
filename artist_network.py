@@ -67,11 +67,11 @@ def generate_graph(en,liked_artists):
 		G.node[n]['score'] += scoring(d,G.node[n]['hotness'],G.node[n]['depth'])
 	nx.write_yaml(G,'artist_graph')
 
-def scoring(degree,popularity,net_depth):
+def scoring(degree,popularity,depth):
 	# degree is between 0 and net_N_neighbors=6
 	# popularity is between 0<pop_threshold and 1
-	# net_depth is between 0 and net_depth=3
-	return( degree + 5.*popularity - 1.5*net_depth)
+	# depth is between 0 and net_depth=3
+	return( degree + 5.*popularity - 1.5*depth)
 
 def display_graph(G):
 	col = ['red','blue','green','orange']

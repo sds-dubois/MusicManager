@@ -1,7 +1,10 @@
 # Music Manager 
-**Personnalized music management tool directly on Spotify!** - *In development*
+**Personnalized music management tool directly on Spotify!** - *In development*  
+Read the article [here](http://sds-dubois.github.io/2015/12/23/Music-Recommendation-on-Spotify.html) for an introdction to the project.
 
-Uses [Echo Nest and Spotify API](http://static.echonest.com/enspex/) to analyze a user's music tastes and automatically create Spotify playlists with new songs to discover.  
+--------------  
+
+Uses [Echo Nest and Spotify APIs](http://static.echonest.com/enspex/) to analyze a user's music tastes and automatically create Spotify playlists with new songs to discover.  
 
 ### Setup
 You should request a key for both Echo Nest and Spotify APIs. Then, you can define all the folowing environment variables: `SPOTIPY_CLIENT_ID`,`SPOTIPY_CLIENT_SECRET`,`SPOTIPY_REDIRECT_URI,SPOTIPY_USERNAME` (for Spotify) and `ECHO_NEST_API_KEY` (for Echo Nest). Once this is done, you'll be able to use this code.  
