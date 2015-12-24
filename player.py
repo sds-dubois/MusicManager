@@ -43,6 +43,8 @@ if __name__ == '__main__':
 		add(track_id)
 	elif(action == 'pass'):
 		remove(track_id)
+	elif(action == 'save'):
+		save(track_id)
 	else:
-		print 'ERROR: wrong action argument, should be like or pass',sys.argv
+		print 'ERROR: wrong action argument, should be like, pass, or save',sys.argv
 		sys.exit(1)
