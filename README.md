@@ -1,6 +1,6 @@
 # Music Manager 
 **Personnalized music management tool directly on Spotify!** - *In development*  
-Read the article [here](http://sds-dubois.github.io/2015/12/23/Music-Recommendation-on-Spotify.html) for an introdction to the project.
+Read the article [here](http://sds-dubois.github.io/2015/12/23/Music-Recommendation-on-Spotify.html) for an introduction to the project.
 
 --------------  
 
