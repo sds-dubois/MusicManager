@@ -1,5 +1,5 @@
 # Music Manager 
-Personnalized music management tool directly on Spotify  - *In development*
+**Personnalized music management tool directly on Spotify!** - *In development*
 
 Uses [Echo Nest and Spotify API](http://static.echonest.com/enspex/) to analyze a user's music tastes and automatically create Spotify playlists with new songs to discover.  
 
@@ -16,7 +16,7 @@ If you have any trouble, you can check [this](http://spotipy.readthedocs.org/en/
 - Want to get more recommended songs ? Just rebuilt the artist network and check for new tracks (config : `create_artist_network=True`, `check_new_tracks=True`, `add_to_playlist=True`).  
 
 
-### Comming next
+### Coming next
 Analyzing your tastes with the song database built with music details and pass/like reactions !
 
 ### Dependencies
