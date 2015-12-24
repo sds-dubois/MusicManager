@@ -7,6 +7,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import os
 import pickle
+import sys
 
 import pyen
 import spotipy
@@ -66,9 +67,10 @@ def add_to_history(item,history):
 	id = 'spotify:artist:' + item['track']['artists'][0]['id']
 	if not(id in history):
 		history[id] = []
-	history[id].append(title.lower())
+	if not(title.lower() in history[id]):
+		history[id].append(title.lower())
 
-def get_liked_tracks(p_name='Liked',history={}):
+def get_liked_tracks(p_name='Liked',history={}, reset_db=False):
 	token = login()
 
 	if token:
@@ -79,30 +81,36 @@ def get_liked_tracks(p_name='Liked',history={}):
 			if(p['name'] == p_name):
 				playlist = p
 
-		liked_tracks = set()
 		liked_artists = set()
-		if(playlist is not None):
-			results = sp.user_playlist(username, playlist['id'], fields="tracks,next")
-			tracks = results['tracks']
-			liked_tracks.update([ item['track']['name'] for item in tracks['items'] ])
+		if(playlist is None):
+			print 'ERROR: could not find playlist ' + p_name
+			sys.exit(1)
+
+		results = sp.user_playlist(username, playlist['id'], fields="tracks,next")
+		tracks = results['tracks']
+		df, history = add_likes(tracks, history)
+		liked_artists.update([ item['track']['artists'][0]['name'] for item in tracks['items'] ])
+
+		while tracks['next']:
+			tracks = sp.next(tracks)
+			df, history = add_likes(tracks, history, df)
 			liked_artists.update([ item['track']['artists'][0]['name'] for item in tracks['items'] ])
-			map(lambda item: add_to_history(item, history=history),tracks['items'])
 
-			while tracks['next']:
-				print('go to next')
-				liked_tracks.update([ item['track']['name'] for item in tracks['items'] ])
-				liked_artists.update([ item['track']['artists'][0]['name'] for item in tracks['items'] ])
-				map(lambda item: add_to_history(item, history=history),tracks['items'])
-				tracks = sp.next(tracks)
+		save_likes(liked_artists)
 
-			save_likes(liked_artists)
+		# save updated history
+		output_file = open('history.csv', 'wb')
+		pickle.dump(history,output_file)
+		output_file.close()
 
-			output_file = open('history.csv', 'wb')
-			pickle.dump(history,output_file)
-			output_file.close()
-			return history
-		else:
-			print('Error, cannot find playlist')
+		# save songdb
+		if not(reset_db):
+			df2 = pd.read_csv('song_db.csv', encoding='utf-8', index_col='track_id')
+			df = df2.append(df)
+		df.to_csv('song_db.csv', encoding='utf-8')
+
+		return history
 
 	else:
-		print("Can't get token for", username)
+		print "ERROR: Cannot get token for " + username
+		sys.exit(1)

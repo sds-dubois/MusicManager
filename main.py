@@ -21,7 +21,7 @@ else:
 	input_file.close()
 
 if(search_liked_tracks):
-	history = get_liked_tracks(history=history)
+	history = get_liked_tracks(history=history,reset_db=reset_db)
 liked_artists = load_likes()
 
 if(create_artist_network):
@@ -34,22 +34,13 @@ print('Loaded artist network : ' + str(len(G.nodes())) + ' nodes')
 best_nodes = [n for n in G.nodes() if G.node[n]['score'] > score_threshold]
 print(str(len(best_nodes)) + ' selected artists')
 
-if(create_db):
-	populate_db(liked_artists,en)
-
 if(show_best_subgraph):
 	G_bests = G.subgraph(best_nodes)
 	display_graph(G_bests)
 	plt.show()
 
 if(check_new_tracks):
-	all_tracks,history = get_all_hot_songs(en,best_nodes,G,history)
-	output_file = open('new_tracks.csv', 'wb')
-	pickle.dump(all_tracks,output_file)
-	output_file.close()
-	output_file = open('history.csv', 'wb')
-	pickle.dump(history,output_file)
-	output_file.close()
+	get_new_suggestions(best_nodes,G,history)
 
 if(add_to_playlist):
 	token = login('playlist-modify-public')
