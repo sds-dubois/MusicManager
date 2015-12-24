@@ -50,6 +50,48 @@ def add_likes(tracks, history, df1=None):
 		df = df1.append(df)
 	return df, history
 
+
+def add_save_track(track_id):
+	found = False
+
+	# load history and db
+	input_file = open('history.csv', 'r')
+	history = pickle.load(input_file)
+	input_file.close()
+	df = pd.read_csv('song_db.csv', encoding='utf-8', index_col='track_id')
+
+	# get details
+	try:
+		response = en.get('song/profile', track_id = track_id,
+						   results=1,
+						   bucket=['song_hotttnesss','id:spotify','tracks','audio_summary']
+						   )['songs']
+		if(len(response) > 0):
+			song = response[0]
+			if(len(song['tracks']) > 0 and 'foreign_id' in song['tracks'][0]):
+				# add to history
+				history = remember_song(song,history)
+
+				# get details
+				details = song['audio_summary']
+				details.pop('analysis_url')
+				details.pop('audio_md5')
+				for key in ['song_hotttnesss','artist_name','artist_id','title']:
+					details[key] = song[key]
+				details['track_id'] = track_id
+				details['opinion'] = 1
+
+				# update and save songdb
+				found = True
+				df = df.append(details)
+				df.to_csv('song_db.csv', encoding='utf-8')
+
+		if not found:
+			print 'Could not add track\t' + track_id
+	except:
+		print 'WARNING: Could not find track\t' + track_id
+
+
 def get_new_suggestions(artists, G, history, reset=False):
 	df = pd.DataFrame()
 	new_tracks = []
