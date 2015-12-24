@@ -4,12 +4,12 @@ import os
 en = pyen.Pyen()
 
 reset_history = False
-create_db = False
-search_liked_tracks = True
-create_artist_network = True
+reset_db = False
+search_liked_tracks = False
+create_artist_network = False
 show_best_subgraph = False
-check_new_tracks = True
-add_to_playlist = True
-score_threshold = 10
+check_new_tracks = False
+add_to_playlist = False
+score_threshold = 20
 
 username = os.environ.get("SPOTIPY_USERNAME")
