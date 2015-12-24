@@ -22,9 +22,11 @@ else:
 
 if(search_liked_tracks):
 	history = get_liked_tracks(history=history,reset_db=reset_db)
-liked_artists = load_likes()
 
 if(create_artist_network):
+	if not(search_liked_tracks):
+		find_liked_artists()
+	liked_artists = load_likes()
 	generate_graph(en,liked_artists)
 
 G = nx.read_yaml('artist_graph')

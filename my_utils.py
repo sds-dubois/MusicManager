@@ -50,7 +50,7 @@ def remove_from_playlist(track_id, from_playlist='ToDiscover'):
 													  [track_id])
 	print 'Removed track from ' + from_playlist
 
-def save_likes(liked_artists):
+def save_liked_artists(liked_artists):
 	output_file = open('liked_artists.csv', 'wb')
 	pickle.dump(liked_artists,output_file)
 	output_file.close()
@@ -89,14 +89,14 @@ def get_liked_tracks(p_name='Liked',history={}, reset_db=False):
 		results = sp.user_playlist(username, playlist['id'], fields="tracks,next")
 		tracks = results['tracks']
 		df, history = add_likes(tracks, history)
-		liked_artists.update([ item['track']['artists'][0]['name'] for item in tracks['items'] ])
+		liked_artists.update([ item['track']['artists'][0]['name'] for item in tracks['items']])
 
 		while tracks['next']:
 			tracks = sp.next(tracks)
 			df, history = add_likes(tracks, history, df)
-			liked_artists.update([ item['track']['artists'][0]['name'] for item in tracks['items'] ])
+			liked_artists.update([ item['track']['artists'][0]['name'] for item in tracks['items']])
 
-		save_likes(liked_artists)
+		save_liked_artists(liked_artists)
 
 		# save updated history
 		output_file = open('history.csv', 'wb')
@@ -110,6 +110,35 @@ def get_liked_tracks(p_name='Liked',history={}, reset_db=False):
 		df.to_csv('song_db.csv', encoding='utf-8')
 
 		return history
+
+	else:
+		print "ERROR: Cannot get token for " + username
+		sys.exit(1)
+
+def find_liked_artists(p_name='Liked'):
+	token = login()
+
+	if token:
+		sp = spotipy.Spotify(auth=token)
+		playlists = sp.user_playlists(username)['items']
+		playlist = None
+		for p in playlists:
+			if(p['name'] == p_name):
+				playlist = p
+
+		liked_artists = set()
+		if(playlist is None):
+			print 'ERROR: could not find playlist ' + p_name
+			sys.exit(1)
+
+		results = sp.user_playlist(username, playlist['id'], fields="tracks,next")
+		tracks = results['tracks']
+		liked_artists.update([ item['track']['artists'][0]['name'] for item in tracks['items']])
+		while tracks['next']:
+			tracks = sp.next(tracks)
+			liked_artists.update([ item['track']['artists'][0]['name'] for item in tracks['items']])
+
+		save_liked_artists(liked_artists)
 
 	else:
 		print "ERROR: Cannot get token for " + username
